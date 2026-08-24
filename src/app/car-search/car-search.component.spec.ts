@@ -60,7 +60,7 @@ describe('CarSearchComponent', () => {
     expect(states).toEqual([
       {
         status: 'idle',
-        results: [],
+        cars: [],
         totalResults: 0,
       },
     ]);
@@ -145,7 +145,7 @@ describe('CarSearchComponent', () => {
     tick(500);
 
     expect(states[states.length - 1].status).toBe('idle');
-    expect(states[states.length - 1].results).toEqual([]);
+    expect(states[states.length - 1].cars).toEqual([]);
 
     subscription.unsubscribe();
   }));
@@ -181,9 +181,9 @@ describe('CarSearchComponent', () => {
     expect(
       carSearchApiService.search.calls.allArgs().map(([query]) => query.offset),
     ).toEqual([0, 10]);
-    expect(states[states.length - 1].results.length).toBe(20);
-    expect(states[states.length - 1].results[0].ci).toBe('car-1');
-    expect(states[states.length - 1].results[19].ci).toBe('car-20');
+    expect(states[states.length - 1].cars.length).toBe(20);
+    expect(states[states.length - 1].cars[0].ci).toBe('car-1');
+    expect(states[states.length - 1].cars[19].ci).toBe('car-20');
 
     subscription.unsubscribe();
   }));
@@ -249,8 +249,8 @@ describe('CarSearchComponent', () => {
     expect(
       carSearchApiService.search.calls.allArgs().map(([query]) => query.offset),
     ).toEqual([0, 10, 0]);
-    expect(states[states.length - 1].results.length).toBe(10);
-    expect(states[states.length - 1].results[0].ci).toBe('car-101');
+    expect(states[states.length - 1].cars.length).toBe(10);
+    expect(states[states.length - 1].cars[0].ci).toBe('car-101');
 
     subscription.unsubscribe();
   }));
@@ -270,7 +270,7 @@ describe('CarSearchComponent', () => {
     component.loadMore();
 
     expect(states[states.length - 1].status).toBe('error');
-    expect(states[states.length - 1].results.length).toBe(10);
+    expect(states[states.length - 1].cars.length).toBe(10);
 
     component.loadMore();
 
@@ -278,7 +278,7 @@ describe('CarSearchComponent', () => {
       carSearchApiService.search.calls.allArgs().map(([query]) => query.offset),
     ).toEqual([0, 10, 10]);
     expect(states[states.length - 1].status).toBe('success');
-    expect(states[states.length - 1].results.length).toBe(20);
+    expect(states[states.length - 1].cars.length).toBe(20);
 
     subscription.unsubscribe();
   }));

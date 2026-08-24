@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.car-search {
+  width: min(calc(100% - 2rem), 72rem);
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem) 0 4rem;
+}
+
+@media (max-width: 35rem) {
+  .car-search {
+    width: min(calc(100% - 1rem), 72rem);
+  }
+}

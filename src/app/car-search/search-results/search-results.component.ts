@@ -21,7 +21,7 @@ export class SearchResultsComponent {
   @Output() loadMore = new EventEmitter<void>();
 
   get hasMore(): boolean {
-    return this.state.results.length < this.state.totalResults;
+    return this.state.cars.length < this.state.totalResults;
   }
 
   requestMore(): void {

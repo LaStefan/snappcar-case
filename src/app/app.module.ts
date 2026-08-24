@@ -9,6 +9,7 @@ import { AppComponent } from './app.component';
 import { CarSearchComponent } from './car-search/car-search.component';
 import { SearchControlsComponent } from './car-search/search-controls/search-controls.component';
 import { SearchResultsComponent } from './car-search/search-results/search-results.component';
+import { CarCardComponent } from './car-search/car-card/car-card.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { SearchResultsComponent } from './car-search/search-results/search-resul
     CarSearchComponent,
     SearchControlsComponent,
     SearchResultsComponent,
+    CarCardComponent,
   ],
   imports: [
     BrowserModule,

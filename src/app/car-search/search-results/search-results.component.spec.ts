@@ -6,6 +6,7 @@ import {
   CarSearchResult,
   CarSearchViewState,
 } from '../car-search.models';
+import { CarCardComponent } from '../car-card/car-card.component';
 import { SearchResultsComponent } from './search-results.component';
 
 describe('SearchResultsComponent', () => {
@@ -41,7 +42,7 @@ describe('SearchResultsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [SearchResultsComponent],
+      declarations: [SearchResultsComponent, CarCardComponent],
       imports: [CommonModule, InfiniteScrollModule],
     }).compileComponents();
 
@@ -53,7 +54,7 @@ describe('SearchResultsComponent', () => {
   it('should create with the idle message', () => {
     expect(component).toBeTruthy();
     expect(fixture.nativeElement.textContent).toContain(
-      'Enter a supported city to start searching.',
+      'Find a car in your neighbourhood',
     );
   });
 
@@ -65,19 +66,21 @@ describe('SearchResultsComponent', () => {
     ) as HTMLElement;
 
     expect(section.getAttribute('aria-busy')).toBe('true');
-    expect(section.textContent).toContain('Searching for available cars');
+    expect(section.textContent).toContain('Finding your next ride');
   });
 
   it('should render successful search results', () => {
     setState({
       status: 'success',
-      results: [result],
+      cars: [result],
       totalResults: 1,
     });
 
     const element: HTMLElement = fixture.nativeElement;
 
-    expect(element.querySelectorAll('li').length).toBe(1);
+    expect(element.querySelectorAll('.search-results__grid > li').length).toBe(
+      1,
+    );
     expect(element.textContent).toContain('1 car found');
     expect(element.textContent).toContain('Toyota AYGO');
     expect(element.textContent).toContain('0.3');
@@ -87,7 +90,7 @@ describe('SearchResultsComponent', () => {
     setState(createState('unsupported-city'));
 
     expect(fixture.nativeElement.textContent).toContain(
-      'This city is not currently supported.',
+      'We haven’t parked there yet',
     );
   });
 
@@ -95,7 +98,7 @@ describe('SearchResultsComponent', () => {
     setState(createState('empty'));
 
     expect(fixture.nativeElement.textContent).toContain(
-      'No cars were found near this city.',
+      'No cars in this radius',
     );
   });
 
@@ -103,20 +106,22 @@ describe('SearchResultsComponent', () => {
     setState(createState('error'));
 
     expect(fixture.nativeElement.textContent).toContain(
-      'We could not load the cars.',
+      'We hit a speed bump',
     );
   });
 
   it('should keep results visible while the next page is loading', () => {
     setState({
       status: 'loading',
-      results: [result],
+      cars: [result],
       totalResults: 2,
     });
 
     const element: HTMLElement = fixture.nativeElement;
 
-    expect(element.querySelectorAll('li').length).toBe(1);
+    expect(element.querySelectorAll('.search-results__grid > li').length).toBe(
+      1,
+    );
     expect(element.textContent).toContain('Loading more cars');
     expect(element.querySelector('button')).toBeNull();
   });
@@ -124,14 +129,16 @@ describe('SearchResultsComponent', () => {
   it('should preserve results and offer retry after a pagination error', () => {
     setState({
       status: 'error',
-      results: [result],
+      cars: [result],
       totalResults: 2,
     });
 
     const element: HTMLElement = fixture.nativeElement;
     const button = element.querySelector('button') as HTMLButtonElement;
 
-    expect(element.querySelectorAll('li').length).toBe(1);
+    expect(element.querySelectorAll('.search-results__grid > li').length).toBe(
+      1,
+    );
     expect(element.textContent).toContain('We could not load more cars.');
     expect(button.textContent).toContain('Try again');
   });
@@ -140,7 +147,7 @@ describe('SearchResultsComponent', () => {
     spyOn(component.loadMore, 'emit');
     setState({
       status: 'success',
-      results: [result],
+      cars: [result],
       totalResults: 2,
     });
 
@@ -155,7 +162,7 @@ describe('SearchResultsComponent', () => {
   it('should indicate when all results are loaded', () => {
     setState({
       status: 'success',
-      results: [result],
+      cars: [result],
       totalResults: 1,
     });
 
@@ -177,7 +184,7 @@ describe('SearchResultsComponent', () => {
   ): CarSearchViewState {
     return {
       status,
-      results: [],
+      cars: [],
       totalResults: 0,
     };
   }

@@ -130,7 +130,7 @@ export class CarSearchComponent {
           if (!city) {
             return of({
               status: 'unsupported-city',
-              results: [],
+              cars: [],
               totalResults: 0,
             });
           }
@@ -227,14 +227,14 @@ export class CarSearchComponent {
       };
     }
 
-    const results =
+    const cars =
       event.offset === 0
         ? event.response.results
-        : [...state.results, ...event.response.results];
+        : [...state.cars, ...event.response.results];
 
     return {
-      status: results.length > 0 ? 'success' : 'empty',
-      results,
+      status: cars.length > 0 ? 'success' : 'empty',
+      cars: cars,
       totalResults: event.response.sums.totalResults,
     };
   }

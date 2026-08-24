@@ -31,12 +31,12 @@ export const SUPPORTED_CITIES: readonly SupportedCity[] = [
     latitude: 51.9244,
     longitude: 4.4777,
   },
-  // {
-  //   name: 'Berlin',
-  //   country: 'DE',
-  //   latitude: 52.52,
-  //   longitude: 13.405,
-  // },
+  {
+    name: 'Berlin',
+    country: 'DE',
+    latitude: 52.52,
+    longitude: 13.405,
+  },
 ];
 
 export const MAX_DISTANCE_OPTIONS: ReadonlyArray<{
@@ -64,7 +64,7 @@ export const DEFAULT_SORT: SortOption = 'recommended';
 
 export const INITIAL_SEARCH_STATE: CarSearchViewState = {
   status: 'idle',
-  results: [],
+  cars: [],
   totalResults: 0,
 };
 

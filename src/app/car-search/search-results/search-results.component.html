@@ -9,68 +9,176 @@
   aria-live="polite"
   [attr.aria-busy]="state.status === 'loading'"
 >
-  <p *ngIf="state.status === 'idle'">
-    Enter a supported city to start searching.
-  </p>
+  <section
+    *ngIf="state.cars.length === 0"
+    class="search-status"
+    aria-labelledby="search-state-title"
+    [ngSwitch]="state.status"
+  >
+    <ng-container *ngSwitchCase="'idle'">
+      <div
+        class="search-status__icon search-status__icon--blue"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24">
+          <circle cx="10.5" cy="10.5" r="5.5"></circle>
+          <path d="m15 15 5 5"></path>
+          <path d="M7.5 10.5h6"></path>
+        </svg>
+      </div>
 
-  <p *ngIf="state.status === 'loading' && state.results.length === 0">
-    Searching for available cars…
-  </p>
+      <p class="search-status__eyebrow">Ready when you are</p>
 
-  <p *ngIf="state.status === 'unsupported-city'">
-    This city is not currently supported. Please select one from the
-    suggestions.
-  </p>
+      <h2 id="search-state-title">Find a car in your neighbourhood</h2>
 
-  <p *ngIf="state.status === 'empty'">No cars were found near this city.</p>
+      <p class="search-status__message">
+        Enter one of the supported cities above to discover available cars
+        nearby.
+      </p>
+    </ng-container>
 
-  <p *ngIf="state.status === 'error' && state.results.length === 0">
-    We could not load the cars. Please try again.
-  </p>
+    <ng-container *ngSwitchCase="'loading'">
+      <div class="search-status__road" aria-hidden="true">
+        <div class="search-status__car">
+          <svg viewBox="0 0 120 60">
+            <path d="M24 35 38 17h41l18 18Z" fill="#3BC4FF"></path>
 
-  <ng-container *ngIf="state.results.length > 0">
-    <p>
+            <rect
+              x="8"
+              y="32"
+              width="104"
+              height="20"
+              rx="10"
+              fill="#FF640A"
+            ></rect>
+
+            <path
+              d="M42 22h14v11H33Zm19 0h15l13 11H61Z"
+              fill="white"
+              opacity="0.9"
+            ></path>
+
+            <circle cx="33" cy="49" r="8" fill="#242729"></circle>
+
+            <circle cx="33" cy="49" r="3" fill="#3BC4FF"></circle>
+
+            <circle cx="88" cy="49" r="8" fill="#242729"></circle>
+
+            <circle cx="88" cy="49" r="3" fill="#3BC4FF"></circle>
+
+            <circle cx="104" cy="39" r="3" fill="#FFF3B0"></circle>
+          </svg>
+        </div>
+      </div>
+
+      <p class="search-status__eyebrow">Searching nearby</p>
+
+      <h2 id="search-state-title">Finding your next ride…</h2>
+
+      <p class="search-status__message">
+        We’re checking available cars around your selected city.
+      </p>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'unsupported-city'">
+      <div
+        class="search-status__icon search-status__icon--orange"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"></path>
+          <circle cx="12" cy="9" r="2.5"></circle>
+        </svg>
+      </div>
+
+      <p class="search-status__eyebrow">City unavailable</p>
+
+      <h2 id="search-state-title">We haven’t parked there yet</h2>
+
+      <p class="search-status__message">
+        Choose one of the supported cities from the suggestions and we’ll search
+        there.
+      </p>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'empty'">
+      <div
+        class="search-status__icon search-status__icon--blue"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M4 15h16l-2-6H7Z"></path>
+          <path d="M3 15v4h2m16-4v4h-2"></path>
+          <circle cx="7" cy="18" r="2"></circle>
+          <circle cx="17" cy="18" r="2"></circle>
+        </svg>
+      </div>
+
+      <p class="search-status__eyebrow">No matches</p>
+
+      <h2 id="search-state-title">No cars in this radius</h2>
+
+      <p class="search-status__message">
+        Try increasing the maximum distance or searching in another supported
+        city.
+      </p>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'error'">
+      <div
+        class="search-status__icon search-status__icon--error"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M12 7v6"></path>
+          <path d="M12 17h.01"></path>
+        </svg>
+      </div>
+
+      <p class="search-status__eyebrow">Something went wrong</p>
+
+      <h2 id="search-state-title">We hit a speed bump</h2>
+
+      <p class="search-status__message">
+        Check your connection or change a search option to try again.
+      </p>
+    </ng-container>
+  </section>
+
+  <ng-container *ngIf="state.cars.length > 0">
+    <p class="search-results__summary">
       {{ state.totalResults }}
       {{ state.totalResults === 1 ? "car" : "cars" }}
       found
     </p>
 
-    <ul>
-      <li *ngFor="let result of state.results; trackBy: trackByCarId">
-        <article>
-          <h2>
-            {{ result.car.make }}
-            {{ result.car.model }}
-          </h2>
-
-          <p>
-            {{ result.car.year }} · {{ result.car.fuelType }} ·
-            {{ result.car.seats }} seats
-          </p>
-
-          <p>
-            {{ result.distance / 1000 | number: "1.1-1" }}
-            km away
-          </p>
-
-          <p>
-            {{
-              result.priceInformation.price
-                | currency
-                  : result.priceInformation.isoCurrencyCode
-                  : "symbol"
-                  : "1.0-2"
-            }}
-          </p>
-        </article>
+    <ul class="search-results__grid">
+      <li *ngFor="let car of state.cars; trackBy: trackByCarId">
+        <app-car-card [car]="car"></app-car-card>
       </li>
     </ul>
 
-    <p *ngIf="state.status === 'loading'">Loading more cars…</p>
+    <div
+      *ngIf="state.status === 'loading'"
+      class="search-results__pagination-status"
+      role="status"
+    >
+      <span class="search-results__spinner" aria-hidden="true"></span>
 
-    <p *ngIf="state.status === 'error'">We could not load more cars.</p>
+      <span>Loading more cars…</span>
+    </div>
+
+    <div
+      *ngIf="state.status === 'error'"
+      class="search-results__pagination-status search-results__pagination-status--error"
+      role="alert"
+    >
+      We could not load more cars. Your existing results are still here.
+    </div>
 
     <button
+      class="search-results__load-more"
       *ngIf="hasMore && state.status !== 'loading'"
       type="button"
       (click)="requestMore()"
@@ -78,7 +186,11 @@
       {{ state.status === "error" ? "Try again" : "Load more cars" }}
     </button>
 
-    <p *ngIf="!hasMore && state.status === 'success'">
+    <p
+      class="search-results__complete"
+      *ngIf="!hasMore && state.status === 'success'"
+    >
+      <span aria-hidden="true">✓</span>
       All available cars have been loaded.
     </p>
   </ng-container>

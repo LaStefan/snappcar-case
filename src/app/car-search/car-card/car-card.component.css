@@ -1,0 +1,143 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.car-card {
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.car-card:hover {
+  transform: translateY(-0.25rem);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.car-card__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--color-surface-muted);
+}
+
+.car-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.car-card__fallback {
+  display: grid;
+  height: 100%;
+  place-content: center;
+  justify-items: center;
+  gap: 0.4rem;
+  color: var(--color-text-muted);
+}
+
+.car-card__fallback span {
+  font-size: 2.5rem;
+}
+
+.car-card__year {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.35rem 0.65rem;
+  color: white;
+  font-weight: 700;
+  background: rgb(36 39 41 / 88%);
+  border-radius: 999px;
+  backdrop-filter: blur(0.5rem);
+}
+
+.car-card__body {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.car-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+h2,
+p {
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.car-card__location {
+  color: var(--color-text-muted);
+}
+
+.car-card__price {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.car-card__price strong {
+  display: block;
+  color: var(--color-brand);
+  font-size: 1.2rem;
+}
+
+.car-card__price span {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.car-card__rating {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.car-card__rating-score {
+  color: var(--color-brand);
+}
+
+.car-card__review-count {
+  color: var(--color-text);
+}
+
+.car-card__specifications {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.car-card__specifications li {
+  padding: 0.35rem 0.65rem;
+  color: var(--color-accent-dark);
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--color-accent-soft);
+  border: 1px solid rgb(59 196 255 / 30%);
+  border-radius: 999px;
+}
+
+.car-card__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.8rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--color-border);
+}

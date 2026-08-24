@@ -1,0 +1,100 @@
+<article class="car-card">
+  <div class="car-card__media">
+    <img
+      *ngIf="imageUrl; else imageFallback"
+      [src]="imageUrl"
+      [alt]="car.car.make + ' ' + car.car.model"
+      width="640"
+      height="400"
+      loading="lazy"
+      (error)="handleImageError()"
+    />
+
+    <ng-template #imageFallback>
+      <div
+        class="car-card__fallback"
+        role="img"
+        [attr.aria-label]="
+          'No photo available for ' + car.car.make + ' ' + car.car.model
+        "
+      >
+        <span aria-hidden="true">🚗</span>
+        <small>Photo unavailable</small>
+      </div>
+    </ng-template>
+
+    <span class="car-card__year">
+      {{ car.car.year }}
+    </span>
+  </div>
+
+  <div class="car-card__body">
+    <header class="car-card__header">
+      <div>
+        <h2>
+          {{ car.car.make }}
+          {{ car.car.model }}
+        </h2>
+
+        <p class="car-card__location">
+          {{ car.car.address.city }}
+        </p>
+      </div>
+
+      <p
+        class="car-card__price"
+        [attr.aria-label]="
+          'Price ' +
+          car.priceInformation.price +
+          ' ' +
+          car.priceInformation.isoCurrencyCode +
+          ' per day'
+        "
+      >
+        <strong>
+          {{
+            car.priceInformation.price
+              | currency
+                : car.priceInformation.isoCurrencyCode
+                : "symbol"
+                : "1.0-2"
+          }}
+        </strong>
+
+        <span>/ day</span>
+      </p>
+    </header>
+
+    <p *ngIf="car.car.reviewAvg !== undefined" class="car-card__rating">
+      <span class="car-card__rating-score">
+        <span aria-hidden="true">★</span>
+        {{ car.car.reviewAvg | number: "1.1-1" }}
+      </span>
+      <span class="car-card__review-count">
+        ({{ car.car.reviewCount }}
+        {{ car.car.reviewCount === 1 ? "review" : "reviews" }})
+      </span>
+    </p>
+
+    <ul class="car-card__specifications" aria-label="Car specifications">
+      <li>{{ car.car.gear }}</li>
+      <li>{{ car.car.fuelType }}</li>
+      <li>
+        {{ car.car.seats }}
+        {{ car.car.seats === 1 ? "seat" : "seats" }}
+      </li>
+    </ul>
+
+    <footer class="car-card__footer">
+      <span>
+        {{ car.distance / 1000 | number: "1.1-1" }}
+        km away
+      </span>
+
+      <span>
+        {{ car.priceInformation.freeKilometersPerDay }}
+        km included
+      </span>
+    </footer>
+  </div>
+</article>

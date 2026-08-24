@@ -72,7 +72,7 @@ export type CarSearchStatus =
 
 export interface CarSearchViewState {
   readonly status: CarSearchStatus;
-  readonly results: readonly CarSearchResult[];
+  readonly cars: readonly CarSearchResult[];
   readonly totalResults: number;
 }
 

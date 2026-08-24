@@ -1,0 +1,116 @@
+:host {
+  display: block;
+}
+
+.search-controls {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  color: var(--color-text);
+  background: linear-gradient(135deg, #e8f9ff 0%, var(--color-accent) 100%);
+  border-radius: 1.75rem;
+  box-shadow: 0 1.25rem 3rem rgb(0 97 138 / 18%);
+}
+
+.search-controls__header {
+  max-width: 45rem;
+  margin-bottom: 2rem;
+}
+
+.search-controls__eyebrow {
+  margin: 0 0 0.75rem;
+  color: var(--color-brand);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+h1 {
+  max-width: 15ch;
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.search-controls__header > p:last-child {
+  max-width: 38rem;
+  margin: 1rem 0 0;
+  color: rgb(36 39 41 / 76%);
+  line-height: 1.6;
+}
+
+.search-controls__field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.search-controls__input {
+  position: relative;
+}
+
+.search-controls__input-icon {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 1rem;
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-accent-dark);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.search-controls__input-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+label {
+  font-weight: 750;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0 0.9rem 0 3rem;
+  color: var(--color-text);
+  background: white;
+  border: 1px solid transparent;
+  border-radius: 0.85rem;
+  box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 10%);
+}
+
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+small {
+  color: rgb(36 39 41 / 70%);
+}
+
+.search-controls__filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+@media (max-width: 43rem) {
+  .search-controls {
+    border-radius: 1.25rem;
+  }
+
+  .search-controls__filters {
+    grid-template-columns: 1fr;
+  }
+}
