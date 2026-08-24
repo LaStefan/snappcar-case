@@ -1,5 +1,11 @@
 <section
   class="search-results"
+  infiniteScroll
+  [scrollWindow]="true"
+  [infiniteScrollDistance]="1"
+  [infiniteScrollThrottle]="150"
+  [infiniteScrollDisabled]="!hasMore || state.status !== 'success'"
+  (scrolled)="requestMore()"
   aria-live="polite"
   [attr.aria-busy]="state.status === 'loading'"
 >
@@ -7,7 +13,9 @@
     Enter a supported city to start searching.
   </p>
 
-  <p *ngIf="state.status === 'loading'">Searching for available cars…</p>
+  <p *ngIf="state.status === 'loading' && state.results.length === 0">
+    Searching for available cars…
+  </p>
 
   <p *ngIf="state.status === 'unsupported-city'">
     This city is not currently supported. Please select one from the
@@ -16,17 +24,24 @@
 
   <p *ngIf="state.status === 'empty'">No cars were found near this city.</p>
 
-  <p *ngIf="state.status === 'error'">
+  <p *ngIf="state.status === 'error' && state.results.length === 0">
     We could not load the cars. Please try again.
   </p>
 
-  <ng-container *ngIf="state.status === 'success'">
-    <p>{{ state.totalResults }} cars found</p>
+  <ng-container *ngIf="state.results.length > 0">
+    <p>
+      {{ state.totalResults }}
+      {{ state.totalResults === 1 ? "car" : "cars" }}
+      found
+    </p>
 
     <ul>
       <li *ngFor="let result of state.results; trackBy: trackByCarId">
         <article>
-          <h2>{{ result.car.make }} {{ result.car.model }}</h2>
+          <h2>
+            {{ result.car.make }}
+            {{ result.car.model }}
+          </h2>
 
           <p>
             {{ result.car.year }} · {{ result.car.fuelType }} ·
@@ -37,6 +52,7 @@
             {{ result.distance / 1000 | number: "1.1-1" }}
             km away
           </p>
+
           <p>
             {{
               result.priceInformation.price
@@ -49,5 +65,21 @@
         </article>
       </li>
     </ul>
+
+    <p *ngIf="state.status === 'loading'">Loading more cars…</p>
+
+    <p *ngIf="state.status === 'error'">We could not load more cars.</p>
+
+    <button
+      *ngIf="hasMore && state.status !== 'loading'"
+      type="button"
+      (click)="requestMore()"
+    >
+      {{ state.status === "error" ? "Try again" : "Load more cars" }}
+    </button>
+
+    <p *ngIf="!hasMore && state.status === 'success'">
+      All available cars have been loaded.
+    </p>
   </ng-container>
 </section>

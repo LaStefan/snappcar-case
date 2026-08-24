@@ -8,6 +8,9 @@
   ></app-search-controls>
 
   <ng-container *ngIf="searchState$ | async as state">
-    <app-search-results [state]="state"></app-search-results>
+    <app-search-results
+      [state]="state"
+      (loadMore)="loadMore()"
+    ></app-search-results>
   </ng-container>
 </main>

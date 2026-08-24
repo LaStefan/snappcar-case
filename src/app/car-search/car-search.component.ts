@@ -5,11 +5,16 @@ import {
   combineLatest,
   debounceTime,
   distinctUntilChanged,
+  exhaustMap,
+  filter,
   map,
   Observable,
   of,
+  scan,
   startWith,
+  Subject,
   switchMap,
+  tap,
 } from 'rxjs';
 import {
   DEFAULT_MAX_DISTANCE,
@@ -20,6 +25,7 @@ import {
   SUPPORTED_CITIES,
 } from './car-search.constants';
 import {
+  CarSearchResponse,
   CarSearchViewState,
   MaxDistance,
   SortOption,
@@ -27,6 +33,21 @@ import {
   SupportedCity,
 } from './car-search.models';
 import { CarSearchApiService } from './services/car-search-api.service';
+
+type SearchPageEvent =
+  | {
+      readonly type: 'loading';
+      readonly offset: number;
+    }
+  | {
+      readonly type: 'success';
+      readonly offset: number;
+      readonly response: CarSearchResponse;
+    }
+  | {
+      readonly type: 'error';
+      readonly offset: number;
+    };
 
 @Component({
   selector: 'app-car-search',
@@ -57,9 +78,14 @@ export class CarSearchComponent {
   });
 
   readonly searchState$: Observable<CarSearchViewState>;
+  private readonly loadMoreSubject = new Subject<void>();
 
   constructor(private readonly carSearchApiService: CarSearchApiService) {
     this.searchState$ = this.createSearchState();
+  }
+
+  loadMore(): void {
+    this.loadMoreSubject.next();
   }
 
   private createSearchState(): Observable<CarSearchViewState> {
@@ -109,7 +135,7 @@ export class CarSearchComponent {
             });
           }
 
-          return this.searchCity(city, maxDistance, sort, sortOrder);
+          return this.searchPages(city, maxDistance, sort, sortOrder);
         },
       ),
 
@@ -117,43 +143,99 @@ export class CarSearchComponent {
     );
   }
 
-  private searchCity(
+  private searchPages(
     city: SupportedCity,
     maxDistance: MaxDistance,
     sort: SortOption,
     sortOrder: SortOrder,
   ): Observable<CarSearchViewState> {
-    const loadingState: CarSearchViewState = {
-      ...INITIAL_SEARCH_STATE,
-      status: 'loading',
-    };
+    let nextOffset = 0;
+    let hasMore = true;
 
-    const errorState: CarSearchViewState = {
-      ...INITIAL_SEARCH_STATE,
-      status: 'error',
-    };
+    return this.loadMoreSubject.pipe(
+      // Load the first page automatically.
+      startWith(undefined),
+      // Stop requesting once every result is loaded.
+      filter(() => hasMore),
+      // Ignore additional scroll events while a request is already running.
+      exhaustMap(() => {
+        const offset = nextOffset;
 
-    return this.carSearchApiService
-      .search({
-        country: city.country,
-        latitude: city.latitude,
-        longitude: city.longitude,
-        maxDistance,
-        sort,
-        order: sortOrder,
-        limit: PAGE_SIZE,
-        offset: 0,
-      })
-      .pipe(
-        map(
-          (response): CarSearchViewState => ({
-            status: response.results.length > 0 ? 'success' : 'empty',
-            results: response.results,
-            totalResults: response.sums.totalResults,
-          }),
-        ),
-        startWith(loadingState),
-        catchError(() => of(errorState)),
-      );
+        const loadingEvent: SearchPageEvent = {
+          type: 'loading',
+          offset,
+        };
+
+        return this.carSearchApiService
+          .search({
+            country: city.country,
+            latitude: city.latitude,
+            longitude: city.longitude,
+            maxDistance,
+            sort,
+            order: sortOrder,
+            limit: PAGE_SIZE,
+            offset,
+          })
+          .pipe(
+            tap((response) => {
+              nextOffset += PAGE_SIZE;
+
+              hasMore = nextOffset < response.sums.totalResults;
+            }),
+
+            map(
+              (response): SearchPageEvent => ({
+                type: 'success',
+                offset,
+                response,
+              }),
+            ),
+
+            startWith(loadingEvent),
+
+            catchError(() =>
+              of<SearchPageEvent>({
+                type: 'error',
+                offset,
+              }),
+            ),
+          );
+      }),
+      scan<SearchPageEvent, CarSearchViewState>(
+        (state, event) => this.reducePageEvent(state, event),
+        INITIAL_SEARCH_STATE,
+      ),
+    );
+  }
+
+  private reducePageEvent(
+    state: CarSearchViewState,
+    event: SearchPageEvent,
+  ): CarSearchViewState {
+    if (event.type === 'loading') {
+      return {
+        ...(event.offset === 0 ? INITIAL_SEARCH_STATE : state),
+        status: 'loading',
+      };
+    }
+
+    if (event.type === 'error') {
+      return {
+        ...(event.offset === 0 ? INITIAL_SEARCH_STATE : state),
+        status: 'error',
+      };
+    }
+
+    const results =
+      event.offset === 0
+        ? event.response.results
+        : [...state.results, ...event.response.results];
+
+    return {
+      status: results.length > 0 ? 'success' : 'empty',
+      results,
+      totalResults: event.response.sums.totalResults,
+    };
   }
 }

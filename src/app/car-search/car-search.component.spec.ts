@@ -1,7 +1,8 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { Observable, of, Subscription, throwError } from 'rxjs';
+import { Observable, of, Subject, Subscription, throwError } from 'rxjs';
 
 import {
+  CarSearchResult,
   CarSearchResponse,
   CarSearchViewState,
 } from './car-search.models';
@@ -12,40 +13,7 @@ describe('CarSearchComponent', () => {
   let component: CarSearchComponent;
   let carSearchApiService: jasmine.SpyObj<CarSearchApiService>;
 
-  const response: CarSearchResponse = {
-    results: [
-      {
-        ci: 'car-1',
-        distance: 337,
-        priceInformation: {
-          price: 34,
-          pricePerKilometer: 0.2,
-          freeKilometersPerDay: 100,
-          rentalDays: 1,
-          isoCurrencyCode: 'EUR',
-        },
-        car: {
-          year: 2018,
-          make: 'Toyota',
-          model: 'AYGO',
-          fuelType: 'Petrol',
-          gear: 'Manual',
-          seats: 4,
-          reviewCount: 365,
-          reviewAvg: 4.89,
-          images: ['car.jpg'],
-          address: {
-            city: 'Utrecht',
-            countryCode: 'NL',
-          },
-        },
-      },
-    ],
-    sums: {
-      totalResults: 1,
-    },
-    searchId: 'test-search-id',
-  };
+  const response = createResponse(1, 1, 1);
 
   beforeEach(async () => {
     carSearchApiService = jasmine.createSpyObj<CarSearchApiService>(
@@ -200,6 +168,121 @@ describe('CarSearchComponent', () => {
     subscription.unsubscribe();
   }));
 
+  it('should request and append the next page', fakeAsync(() => {
+    const firstPage = createResponse(1, 10, 20);
+    const secondPage = createResponse(11, 10, 20);
+    carSearchApiService.search.and.returnValues(of(firstPage), of(secondPage));
+    const { states, subscription } = collectStates();
+
+    component.cityControl.setValue('Utrecht');
+    tick(500);
+    component.loadMore();
+
+    expect(
+      carSearchApiService.search.calls.allArgs().map(([query]) => query.offset),
+    ).toEqual([0, 10]);
+    expect(states[states.length - 1].results.length).toBe(20);
+    expect(states[states.length - 1].results[0].ci).toBe('car-1');
+    expect(states[states.length - 1].results[19].ci).toBe('car-20');
+
+    subscription.unsubscribe();
+  }));
+
+  it('should ignore repeated load-more events while a request is active', fakeAsync(() => {
+    const pendingFirstPage = new Subject<CarSearchResponse>();
+    const firstPage = createResponse(1, 10, 20);
+    const secondPage = createResponse(11, 10, 20);
+    carSearchApiService.search.and.returnValues(
+      pendingFirstPage.asObservable(),
+      of(secondPage),
+    );
+    const { subscription } = collectStates();
+
+    component.cityControl.setValue('Utrecht');
+    tick(500);
+    component.loadMore();
+    component.loadMore();
+
+    expect(carSearchApiService.search).toHaveBeenCalledTimes(1);
+
+    pendingFirstPage.next(firstPage);
+    pendingFirstPage.complete();
+    component.loadMore();
+
+    expect(carSearchApiService.search).toHaveBeenCalledTimes(2);
+    expect(carSearchApiService.search.calls.mostRecent().args[0].offset).toBe(
+      10,
+    );
+
+    subscription.unsubscribe();
+  }));
+
+  it('should stop requesting when all results are loaded', fakeAsync(() => {
+    carSearchApiService.search.and.returnValue(of(createResponse(1, 10, 10)));
+    const { subscription } = collectStates();
+
+    component.cityControl.setValue('Utrecht');
+    tick(500);
+    component.loadMore();
+
+    expect(carSearchApiService.search).toHaveBeenCalledTimes(1);
+
+    subscription.unsubscribe();
+  }));
+
+  it('should reset the offset and results when a filter changes', fakeAsync(() => {
+    const firstPage = createResponse(1, 10, 20);
+    const secondPage = createResponse(11, 10, 20);
+    const filteredPage = createResponse(101, 10, 10);
+    carSearchApiService.search.and.returnValues(
+      of(firstPage),
+      of(secondPage),
+      of(filteredPage),
+    );
+    const { states, subscription } = collectStates();
+
+    component.cityControl.setValue('Utrecht');
+    tick(500);
+    component.loadMore();
+    component.sortControl.setValue('price');
+
+    expect(
+      carSearchApiService.search.calls.allArgs().map(([query]) => query.offset),
+    ).toEqual([0, 10, 0]);
+    expect(states[states.length - 1].results.length).toBe(10);
+    expect(states[states.length - 1].results[0].ci).toBe('car-101');
+
+    subscription.unsubscribe();
+  }));
+
+  it('should retry a failed page without skipping its offset', fakeAsync(() => {
+    const firstPage = createResponse(1, 10, 20);
+    const secondPage = createResponse(11, 10, 20);
+    carSearchApiService.search.and.returnValues(
+      of(firstPage),
+      throwError(() => new Error('Request failed')),
+      of(secondPage),
+    );
+    const { states, subscription } = collectStates();
+
+    component.cityControl.setValue('Utrecht');
+    tick(500);
+    component.loadMore();
+
+    expect(states[states.length - 1].status).toBe('error');
+    expect(states[states.length - 1].results.length).toBe(10);
+
+    component.loadMore();
+
+    expect(
+      carSearchApiService.search.calls.allArgs().map(([query]) => query.offset),
+    ).toEqual([0, 10, 10]);
+    expect(states[states.length - 1].status).toBe('success');
+    expect(states[states.length - 1].results.length).toBe(20);
+
+    subscription.unsubscribe();
+  }));
+
   it('should cancel the previous request when a new city is searched', fakeAsync(() => {
     let previousRequestCancelled = false;
     const pendingRequest = new Observable<CarSearchResponse>(() => {
@@ -222,4 +305,49 @@ describe('CarSearchComponent', () => {
 
     subscription.unsubscribe();
   }));
+
+  function createResponse(
+    firstCarNumber: number,
+    resultCount: number,
+    totalResults: number,
+  ): CarSearchResponse {
+    return {
+      results: Array.from({ length: resultCount }, (_value, index) =>
+        createResult(`car-${firstCarNumber + index}`),
+      ),
+      sums: {
+        totalResults,
+      },
+      searchId: 'test-search-id',
+    };
+  }
+
+  function createResult(id: string): CarSearchResult {
+    return {
+      ci: id,
+      distance: 337,
+      priceInformation: {
+        price: 34,
+        pricePerKilometer: 0.2,
+        freeKilometersPerDay: 100,
+        rentalDays: 1,
+        isoCurrencyCode: 'EUR',
+      },
+      car: {
+        year: 2018,
+        make: 'Toyota',
+        model: 'AYGO',
+        fuelType: 'Petrol',
+        gear: 'Manual',
+        seats: 4,
+        reviewCount: 365,
+        reviewAvg: 4.89,
+        images: ['car.jpg'],
+        address: {
+          city: 'Utrecht',
+          countryCode: 'NL',
+        },
+      },
+    };
+  }
 });
