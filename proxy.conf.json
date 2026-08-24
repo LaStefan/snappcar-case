@@ -1,0 +1,8 @@
+{
+  "/v2": {
+    "target": "https://api.snappcar.nl",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
