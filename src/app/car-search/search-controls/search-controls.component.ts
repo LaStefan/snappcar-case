@@ -1,7 +1,17 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import {
+  MAX_DISTANCE_OPTIONS,
+  SORT_OPTIONS,
+  SORT_ORDER_OPTIONS,
+} from '../car-search.constants';
 
-import { SupportedCity } from '../car-search.models';
+import {
+  MaxDistance,
+  SortOption,
+  SortOrder,
+  SupportedCity,
+} from '../car-search.models';
 
 @Component({
   selector: 'app-search-controls',
@@ -11,5 +21,13 @@ import { SupportedCity } from '../car-search.models';
 })
 export class SearchControlsComponent {
   @Input() cityControl!: FormControl<string>;
+  @Input() maxDistanceControl!: FormControl<MaxDistance>;
+  @Input() sortControl!: FormControl<SortOption>;
+  @Input() sortOrderControl!: FormControl<SortOrder>;
+
   @Input() cities: readonly SupportedCity[] = [];
+
+  readonly maxDistanceOptions = MAX_DISTANCE_OPTIONS;
+  readonly sortOptions = SORT_OPTIONS;
+  readonly sortOrderOptions = SORT_ORDER_OPTIONS;
 }

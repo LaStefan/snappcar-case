@@ -18,6 +18,7 @@ export class CarSearchApiService {
       .set('lng', query.longitude)
       .set('max-distance', query.maxDistance)
       .set('sort', query.sort)
+      .set('order', query.order)
       .set('limit', query.limit)
       .set('offset', query.offset);
 

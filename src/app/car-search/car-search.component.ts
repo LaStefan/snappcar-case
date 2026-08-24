@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
   catchError,
+  combineLatest,
   debounceTime,
   distinctUntilChanged,
   map,
@@ -13,11 +14,18 @@ import {
 import {
   DEFAULT_MAX_DISTANCE,
   DEFAULT_SORT,
+  DEFAULT_SORT_ORDER,
   INITIAL_SEARCH_STATE,
   PAGE_SIZE,
   SUPPORTED_CITIES,
 } from './car-search.constants';
-import { CarSearchViewState, SupportedCity } from './car-search.models';
+import {
+  CarSearchViewState,
+  MaxDistance,
+  SortOption,
+  SortOrder,
+  SupportedCity,
+} from './car-search.models';
 import { CarSearchApiService } from './services/car-search-api.service';
 
 @Component({
@@ -33,6 +41,21 @@ export class CarSearchComponent {
     nonNullable: true,
   });
 
+  readonly maxDistanceControl = new FormControl<MaxDistance>(
+    DEFAULT_MAX_DISTANCE,
+    {
+      nonNullable: true,
+    },
+  );
+
+  readonly sortControl = new FormControl<SortOption>(DEFAULT_SORT, {
+    nonNullable: true,
+  });
+
+  readonly sortOrderControl = new FormControl<SortOrder>(DEFAULT_SORT_ORDER, {
+    nonNullable: true,
+  });
+
   readonly searchState$: Observable<CarSearchViewState>;
 
   constructor(private readonly carSearchApiService: CarSearchApiService) {
@@ -40,34 +63,66 @@ export class CarSearchComponent {
   }
 
   private createSearchState(): Observable<CarSearchViewState> {
-    return this.cityControl.valueChanges.pipe(
+    const cityName$ = this.cityControl.valueChanges.pipe(
       map((cityName) => cityName.trim().toLowerCase()),
       debounceTime(500),
       distinctUntilChanged(),
-      switchMap((normalizedName): Observable<CarSearchViewState> => {
-        if (!normalizedName) {
-          return of(INITIAL_SEARCH_STATE);
-        }
+    );
 
-        const city = this.supportedCities.find(
-          (city) => city.name.toLowerCase() === normalizedName,
-        );
+    const maxDistance$ = this.maxDistanceControl.valueChanges.pipe(
+      startWith(this.maxDistanceControl.value),
+      distinctUntilChanged(),
+    );
 
-        if (!city) {
-          return of({
-            status: 'unsupported-city',
-            results: [],
-            totalResults: 0,
-          });
-        }
+    const sort$ = this.sortControl.valueChanges.pipe(
+      startWith(this.sortControl.value),
+      distinctUntilChanged(),
+    );
 
-        return this.searchCity(city);
-      }),
+    const sortOrder$ = this.sortOrderControl.valueChanges.pipe(
+      startWith(this.sortOrderControl.value),
+      distinctUntilChanged(),
+    );
+
+    return combineLatest([cityName$, maxDistance$, sort$, sortOrder$]).pipe(
+      switchMap(
+        ([
+          normalizedName,
+          maxDistance,
+          sort,
+          sortOrder,
+        ]): Observable<CarSearchViewState> => {
+          if (!normalizedName) {
+            return of(INITIAL_SEARCH_STATE);
+          }
+
+          const city = this.supportedCities.find(
+            (supportedCity) =>
+              supportedCity.name.toLowerCase() === normalizedName,
+          );
+
+          if (!city) {
+            return of({
+              status: 'unsupported-city',
+              results: [],
+              totalResults: 0,
+            });
+          }
+
+          return this.searchCity(city, maxDistance, sort, sortOrder);
+        },
+      ),
+
       startWith(INITIAL_SEARCH_STATE),
     );
   }
 
-  private searchCity(city: SupportedCity): Observable<CarSearchViewState> {
+  private searchCity(
+    city: SupportedCity,
+    maxDistance: MaxDistance,
+    sort: SortOption,
+    sortOrder: SortOrder,
+  ): Observable<CarSearchViewState> {
     const loadingState: CarSearchViewState = {
       ...INITIAL_SEARCH_STATE,
       status: 'loading',
@@ -83,8 +138,9 @@ export class CarSearchComponent {
         country: city.country,
         latitude: city.latitude,
         longitude: city.longitude,
-        maxDistance: DEFAULT_MAX_DISTANCE,
-        sort: DEFAULT_SORT,
+        maxDistance,
+        sort,
+        order: sortOrder,
         limit: PAGE_SIZE,
         offset: 0,
       })
@@ -96,7 +152,6 @@ export class CarSearchComponent {
             totalResults: response.sums.totalResults,
           }),
         ),
-
         startWith(loadingState),
         catchError(() => of(errorState)),
       );

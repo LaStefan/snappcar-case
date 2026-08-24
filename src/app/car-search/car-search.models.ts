@@ -3,6 +3,7 @@ export type CountryCode = 'NL' | 'DE';
 export type MaxDistance = 3000 | 5000 | 7000;
 
 export type SortOption = 'price' | 'recommended' | 'distance';
+export type SortOrder = 'asc' | 'desc';
 
 export interface SupportedCity {
   readonly name: string;
@@ -17,6 +18,7 @@ export interface CarSearchQuery {
   readonly longitude: number;
   readonly maxDistance: MaxDistance;
   readonly sort: SortOption;
+  readonly order: SortOrder;
   readonly limit: number;
   readonly offset: number;
 }
@@ -73,3 +75,4 @@ export interface CarSearchViewState {
   readonly results: readonly CarSearchResult[];
   readonly totalResults: number;
 }
+

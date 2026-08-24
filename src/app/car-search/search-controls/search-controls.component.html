@@ -34,4 +34,43 @@
       Start typing and select one of the supported cities.
     </small>
   </div>
+
+  <div class="search-controls__filters">
+    <div class="search-controls__field">
+      <label for="max-distance"> Maximum distance </label>
+
+      <select id="max-distance" [formControl]="maxDistanceControl">
+        <!-- [ngValue] preserves the numeric distance type. Plain HTML value would normally produce a string such as "5000". -->
+        <option
+          *ngFor="let option of maxDistanceOptions"
+          [ngValue]="option.value"
+        >
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="search-controls__field">
+      <label for="sort"> Sort results by </label>
+
+      <select id="sort" [formControl]="sortControl">
+        <option *ngFor="let option of sortOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="search-controls__field">
+      <label for="sort-order"> Direction </label>
+
+      <select id="sort-order" [formControl]="sortOrderControl">
+        <option
+          *ngFor="let option of sortOrderOptions"
+          [ngValue]="option.value"
+        >
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+  </div>
 </section>

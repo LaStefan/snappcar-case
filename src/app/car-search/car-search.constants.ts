@@ -2,6 +2,7 @@ import {
   CarSearchViewState,
   MaxDistance,
   SortOption,
+  SortOrder,
   SupportedCity,
 } from './car-search.models';
 
@@ -66,3 +67,19 @@ export const INITIAL_SEARCH_STATE: CarSearchViewState = {
   results: [],
   totalResults: 0,
 };
+
+export const SORT_ORDER_OPTIONS: ReadonlyArray<{
+  value: SortOrder;
+  label: string;
+}> = [
+  {
+    value: 'asc',
+    label: 'Ascending (low to high)',
+  },
+  {
+    value: 'desc',
+    label: 'Descending (high to low)',
+  },
+];
+
+export const DEFAULT_SORT_ORDER: SortOrder = 'asc';

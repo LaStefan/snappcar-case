@@ -2,6 +2,9 @@
   <app-search-controls
     [cityControl]="cityControl"
     [cities]="supportedCities"
+    [maxDistanceControl]="maxDistanceControl"
+    [sortControl]="sortControl"
+    [sortOrderControl]="sortOrderControl"
   ></app-search-controls>
 
   <ng-container *ngIf="searchState$ | async as state">

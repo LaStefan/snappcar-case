@@ -18,6 +18,7 @@ describe('CarSearchApiService', () => {
     longitude: 5.1214201,
     maxDistance: 3000,
     sort: 'price',
+    order: 'asc',
     limit: 10,
     offset: 0,
   };
@@ -62,9 +63,9 @@ describe('CarSearchApiService', () => {
     expect(request.request.params.get('lng')).toBe('5.1214201');
     expect(request.request.params.get('max-distance')).toBe('3000');
     expect(request.request.params.get('sort')).toBe('price');
+    expect(request.request.params.get('order')).toBe('asc');
     expect(request.request.params.get('limit')).toBe('10');
     expect(request.request.params.get('offset')).toBe('0');
-    expect(request.request.params.has('order')).toBeFalse();
 
     request.flush(response);
   });

@@ -37,6 +37,15 @@
             {{ result.distance / 1000 | number: "1.1-1" }}
             km away
           </p>
+          <p>
+            {{
+              result.priceInformation.price
+                | currency
+                  : result.priceInformation.isoCurrencyCode
+                  : "symbol"
+                  : "1.0-2"
+            }}
+          </p>
         </article>
       </li>
     </ul>
