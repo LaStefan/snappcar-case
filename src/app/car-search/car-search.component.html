@@ -1,1 +1,10 @@
-<p>car-search works!</p>
+<main class="car-search">
+  <app-search-controls
+    [cityControl]="cityControl"
+    [cities]="supportedCities"
+  ></app-search-controls>
+
+  <ng-container *ngIf="searchState$ | async as state">
+    <app-search-results [state]="state"></app-search-results>
+  </ng-container>
+</main>

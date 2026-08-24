@@ -59,3 +59,17 @@ export interface Car {
     readonly countryCode: string;
   };
 }
+
+export type CarSearchStatus =
+  | 'idle'
+  | 'loading'
+  | 'success'
+  | 'empty'
+  | 'unsupported-city'
+  | 'error';
+
+export interface CarSearchViewState {
+  readonly status: CarSearchStatus;
+  readonly results: readonly CarSearchResult[];
+  readonly totalResults: number;
+}

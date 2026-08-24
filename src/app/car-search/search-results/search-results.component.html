@@ -1,0 +1,44 @@
+<section
+  class="search-results"
+  aria-live="polite"
+  [attr.aria-busy]="state.status === 'loading'"
+>
+  <p *ngIf="state.status === 'idle'">
+    Enter a supported city to start searching.
+  </p>
+
+  <p *ngIf="state.status === 'loading'">Searching for available cars…</p>
+
+  <p *ngIf="state.status === 'unsupported-city'">
+    This city is not currently supported. Please select one from the
+    suggestions.
+  </p>
+
+  <p *ngIf="state.status === 'empty'">No cars were found near this city.</p>
+
+  <p *ngIf="state.status === 'error'">
+    We could not load the cars. Please try again.
+  </p>
+
+  <ng-container *ngIf="state.status === 'success'">
+    <p>{{ state.totalResults }} cars found</p>
+
+    <ul>
+      <li *ngFor="let result of state.results; trackBy: trackByCarId">
+        <article>
+          <h2>{{ result.car.make }} {{ result.car.model }}</h2>
+
+          <p>
+            {{ result.car.year }} · {{ result.car.fuelType }} ·
+            {{ result.car.seats }} seats
+          </p>
+
+          <p>
+            {{ result.distance / 1000 | number: "1.1-1" }}
+            km away
+          </p>
+        </article>
+      </li>
+    </ul>
+  </ng-container>
+</section>

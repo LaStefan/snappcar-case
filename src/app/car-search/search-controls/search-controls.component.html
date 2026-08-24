@@ -1,0 +1,37 @@
+<section class="search-controls" aria-labelledby="search-controls-title">
+  <header class="search-controls__header">
+    <p class="search-controls__eyebrow">Snapp a car from your neighborhood</p>
+
+    <h1 id="search-controls-title">Where do you need a car?</h1>
+
+    <p>
+      Rent your perfect car easily, affordably and well-insured right in your
+      neighbourhood
+    </p>
+  </header>
+
+  <div class="search-controls__field">
+    <label for="city">City</label>
+
+    <input
+      id="city"
+      type="search"
+      [formControl]="cityControl"
+      list="supported-cities"
+      placeholder="Try Utrecht"
+      autocomplete="off"
+      spellcheck="false"
+      aria-describedby="city-hint"
+    />
+
+    <datalist id="supported-cities">
+      <option *ngFor="let city of cities" [value]="city.name">
+        {{ city.name }}, {{ city.country }}
+      </option>
+    </datalist>
+
+    <small id="city-hint">
+      Start typing and select one of the supported cities.
+    </small>
+  </div>
+</section>

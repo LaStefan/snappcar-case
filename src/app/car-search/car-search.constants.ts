@@ -1,4 +1,9 @@
-import { MaxDistance, SortOption, SupportedCity } from './car-search.models';
+import {
+  CarSearchViewState,
+  MaxDistance,
+  SortOption,
+  SupportedCity,
+} from './car-search.models';
 
 export const SUPPORTED_CITIES: readonly SupportedCity[] = [
   {
@@ -8,11 +13,29 @@ export const SUPPORTED_CITIES: readonly SupportedCity[] = [
     longitude: 5.1214201,
   },
   {
-    name: 'Berlin',
-    country: 'DE',
-    latitude: 52.52,
-    longitude: 13.405,
+    name: 'Amsterdam',
+    country: 'NL',
+    latitude: 52.3676,
+    longitude: 4.9041,
   },
+  {
+    name: 'Eindhoven',
+    country: 'NL',
+    latitude: 51.4416,
+    longitude: 5.4697,
+  },
+  {
+    name: 'Rotterdam',
+    country: 'NL',
+    latitude: 51.9244,
+    longitude: 4.4777,
+  },
+  // {
+  //   name: 'Berlin',
+  //   country: 'DE',
+  //   latitude: 52.52,
+  //   longitude: 13.405,
+  // },
 ];
 
 export const MAX_DISTANCE_OPTIONS: ReadonlyArray<{
@@ -34,3 +57,12 @@ export const SORT_OPTIONS: ReadonlyArray<{
 ];
 
 export const PAGE_SIZE = 10;
+
+export const DEFAULT_MAX_DISTANCE: MaxDistance = 3000;
+export const DEFAULT_SORT: SortOption = 'recommended';
+
+export const INITIAL_SEARCH_STATE: CarSearchViewState = {
+  status: 'idle',
+  results: [],
+  totalResults: 0,
+};
