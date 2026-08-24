@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="src/assets/snappcar-logo.svg" alt="SnappCar" width="220" />
+</p>
+
 # SnappCar - Car Search
 
 ![Angular 14](https://img.shields.io/badge/Angular-14-DD0031?logo=angular&logoColor=white)
@@ -140,21 +144,3 @@ The unit tests cover:
 `ngx-infinite-scroll@14.0.1` is the only additional runtime dependency. It is pinned to an Angular 14-compatible release and handles scroll observation, throttling, and cleanup. The application still owns the actual pagination state, offset calculation, concurrency behavior, and API requests.
 
 Using this small dependency avoids maintaining custom window listeners for behavior that is not specific to the business domain.
-
-## Angular 14 HTTP compatibility
-
-This challenge intentionally targets Angular 14, so `AppModule` imports `HttpClientModule`, which is the supported HTTP setup for that version.
-
-Current Angular documentation marks `HttpClientModule` as deprecated and recommends `provideHttpClient(withInterceptorsFromDi())`. That newer provider API is not available in the Angular 14 packages used here. It should be adopted only as part of a future Angular framework upgrade.
-
-## Possible next steps
-
-The following are reasonable production extensions but are outside the challenge scope:
-
-- Replace hardcoded cities with a location/autocomplete API.
-- Synchronize search parameters with the URL for shareable searches.
-- Add end-to-end coverage for the complete search journey.
-- Add runtime response validation and monitoring for API contract changes.
-- Configure a production API gateway or reverse proxy.
-
-These were deliberately left out to keep the submission focused on the requested functionality.

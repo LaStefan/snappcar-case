@@ -213,17 +213,10 @@ export class CarSearchComponent {
     state: CarSearchViewState,
     event: SearchPageEvent,
   ): CarSearchViewState {
-    if (event.type === 'loading') {
+    if (event.type !== 'success') {
       return {
         ...(event.offset === 0 ? INITIAL_SEARCH_STATE : state),
-        status: 'loading',
-      };
-    }
-
-    if (event.type === 'error') {
-      return {
-        ...(event.offset === 0 ? INITIAL_SEARCH_STATE : state),
-        status: 'error',
+        status: event.type,
       };
     }
 
@@ -234,7 +227,7 @@ export class CarSearchComponent {
 
     return {
       status: cars.length > 0 ? 'success' : 'empty',
-      cars: cars,
+      cars,
       totalResults: event.response.sums.totalResults,
     };
   }

@@ -1,12 +1,12 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Observable, of, Subject, Subscription, throwError } from 'rxjs';
 
+import { CarSearchComponent } from './car-search.component';
 import {
-  CarSearchResult,
   CarSearchResponse,
+  CarSearchResult,
   CarSearchViewState,
 } from './car-search.models';
-import { CarSearchComponent } from './car-search.component';
 import { CarSearchApiService } from './services/car-search-api.service';
 
 describe('CarSearchComponent', () => {
